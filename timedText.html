@@ -1,11 +1,13 @@
 <!doctype html>
 <html>
-  <head>  
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Timed Text (LRC) generator</title>
-  </head>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timed Text (LRC) generator</title>
+</head>
 Notes: Proof of concept
+
 <body>
   <h3 id="titletext">Timed Text (LRC) Generator</h3>
 
@@ -13,83 +15,107 @@ Notes: Proof of concept
   <br>
   Paste text to time here<br>
 
-  <textarea id="input_text_id" name="lyrics_id" rows="10" cols="100"></textarea>
-  
-  
+  <textarea id="input_text_id" name="input_text_id" rows="10" cols="100"></textarea>
+
+
   <br><br>
 
-  <button onclick="handleStart()"  class="btn btn-primary">
-    Start music
-</button>
+  <button id="Button_Start_Stop" onclick="handleStartStopButton()" class="btn btn-primary">
+    Start
+  </button>
 
-<button id="Button_NextLyric" onclick="handleNewLyric()" hidden="true" class="btn btn-primary">
-  Next Lyric ("G")
-</button>
+  <button id="Button_NextLine" onclick="handleNewLine()" hidden="true" class="btn btn-primary">
+    Next Line ("G")
+  </button>
 
-<br>
-Output Text
-<br>
-<textarea id="output_id" name="output_id" rows="10" cols="100" disabled="disabled"></textarea>
+  <br>
+  Output Text
+  <br>
+  <textarea id="output_id" name="output_id" rows="10" cols="100" disabled="disabled"></textarea>
 
   </div>
 
 
 
-<script>
+  <script>
 
-let startTime 
-let lines
-let line_counter = 0
-let outputTextArea = document.getElementById("output_id")
-const nextLyricButton = document.getElementById("Button_NextLyric")
+    let startTime
+    let isRunning = false
+    let lines
+    let line_counter = 0
+    let outputTextArea = document.getElementById("output_id")
+    const nextLineButton = document.getElementById("Button_NextLine")
+    const startStopButton = document.getElementById("Button_Start_Stop")
 
-document.addEventListener("keydown", function(event) {
-  if (event.code ==="KeyG") {
+    document.addEventListener("keydown", function (event) {
+      if (event.code === "KeyG") {
 
-    nextLyricButton.click()
-  }
-
-
-});
-
+        nextLineButton.click()
+      }
 
 
-function handleStart() {
-  startTime = performance.now()
-  console.log("Start pressed" + startTime)
-  lines = document.getElementById("input_text_id").value.split('\n');
-  nextLyricButton.hidden = false
-  outputTextArea.textContent = ""
-  line_counter = 0
-}
+    });
 
-function handleNewLyric() {
-  let currentTime = performance.now()
-  console.log("..." + currentTime)  
-  let dataLine = "["+convertMStoTime(((startTime - currentTime) * -1)) + "]" + lines[line_counter].trim()
-  outputTextArea.append(dataLine+ "\r\n") 
-  outputTextArea.scrollTop = outputTextArea.scrollHeight;
-  line_counter = line_counter+1;
-  console.log("done")
-}
-function convertMStoTime(ms) {
-    // Get the total minutes
-    const minutes = Math.floor(ms / 60000);
+    function stop() {
+      isRunning = false
+      startStopButton.innerHTML = "Start"
+      nextLineButton.hidden = true
+    }
 
-    // Get the remainder in milliseconds for seconds calculation
-    const seconds = Math.floor((ms % 60000) / 1000);
+    function handleStartStopButton() {
+      if (isRunning) {
+        stop()
+      }
+      else {
+        isRunning = true
+        startStopButton.innerHTML = "Stop"
+        startTime = performance.now()
+        console.log("Start pressed" + startTime)
+        lines = document.getElementById("input_text_id").value.split('\n');
+        nextLineButton.hidden = false
+        outputTextArea.textContent = ""
+        line_counter = 0
+      }
+    }
 
-    // Get the remaining milliseconds
-    const milliseconds = Math.floor(ms % 1000);
+    function handleNewLine() {
+      console.log("" + line_counter + ".." + lines.length)
 
-    // Format the minutes and seconds to be two digits
-    const formattedMinutes = String(minutes).padStart(2, '0');
-    const formattedSeconds = String(seconds).padStart(2, '0');
-    const formattedMilliseconds = String(milliseconds).padStart(3, '0').substring(0,2); // Milliseconds can be up to 2 digits
+      if (line_counter >= lines.length) {
+        console.log("Reached the end of the text." + line_counter + ".." + lines.length)
+        stop()
 
-    return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
-}
+        return
+      }
 
-</script>
+      let currentTime = performance.now()
+      console.log("..." + currentTime)
+      let dataLine = "[" + convertMStoTime(((startTime - currentTime) * -1)) + "]" + lines[line_counter].trim()
+      outputTextArea.append(dataLine + "\r\n")
+      outputTextArea.scrollTop = outputTextArea.scrollHeight;
+      line_counter = line_counter + 1;
+      console.log("done")
+    }
+    function convertMStoTime(ms) {
+      // Get the total minutes
+      const minutes = Math.floor(ms / 60000);
 
-</body> </html>
+      // Get the remainder in milliseconds for seconds calculation
+      const seconds = Math.floor((ms % 60000) / 1000);
+
+      // Get the remaining milliseconds
+      const milliseconds = Math.floor(ms % 1000);
+
+      // Format the minutes and seconds to be two digits
+      const formattedMinutes = String(minutes).padStart(2, '0');
+      const formattedSeconds = String(seconds).padStart(2, '0');
+      const formattedMilliseconds = String(milliseconds).padStart(3, '0').substring(0, 2); // Milliseconds can be up to 2 digits
+
+      return `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+    }
+
+  </script>
+
+</body>
+
+</html>
