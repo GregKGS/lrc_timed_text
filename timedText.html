@@ -29,6 +29,9 @@ Notes: Proof of concept
   </button>
 
   <br>
+   Up next: <div style="font-size: 2em;" id="upNext_id" name="upNext_id" > ...</div>
+  
+  <br>
   Output Text
   <br>
   <textarea id="output_id" name="output_id" rows="10" cols="100" disabled="disabled"></textarea>
@@ -39,13 +42,14 @@ Notes: Proof of concept
 
   <script>
 
-    let startTime
-    let isRunning = false
-    let lines
-    let line_counter = 0
-    let outputTextArea = document.getElementById("output_id")
-    const nextLineButton = document.getElementById("Button_NextLine")
-    const startStopButton = document.getElementById("Button_Start_Stop")
+    let startTime;
+    let isRunning = false;
+    let lines;
+    let line_counter = 0;
+    let outputTextArea = document.getElementById("output_id");
+    const nextLineButton = document.getElementById("Button_NextLine");
+    const startStopButton = document.getElementById("Button_Start_Stop");
+    const upNextDiv = document.getElementById("upNext_id");
 
     document.addEventListener("keydown", function (event) {
       if (event.code === "KeyG") {
@@ -59,6 +63,7 @@ Notes: Proof of concept
     function stop() {
       isRunning = false
       startStopButton.innerHTML = "Start"
+      upNextDiv.innerHTML = "..."
       nextLineButton.hidden = true
     }
 
@@ -87,6 +92,14 @@ Notes: Proof of concept
 
         return
       }
+
+      if (line_counter === lines.length -1) {
+        upNextDiv.innerHTML = "END";
+      } 
+      else {
+        upNextDiv.innerHTML = lines[line_counter +1 ].trim();
+      }
+
 
       let currentTime = performance.now()
       console.log("..." + currentTime)
